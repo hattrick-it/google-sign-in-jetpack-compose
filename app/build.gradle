@@ -1,0 +1,106 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
+}
+ext { koin_version = "3.2.0-beta-1" }
+ext { nav_version = "2.4.2" }
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.hattrick.googlesignin"
+        minSdk 23
+        targetSdk 31
+        versionCode appVersionCode.toInteger()
+        versionName appVersionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildFeatures {
+        viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.2.0-alpha08'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+
+    def props = new Properties()
+    try {
+        file("../build.properties").withInputStream { props.load(it) }
+    } catch (e) {
+        println("build.properties file not found, this file is not commited, ask for it to the previous developer")
+    }
+
+    def prodStoreFile = System.getenv("PRODUCTION_STORE_FILE") ?: props.getProperty("PRODUCTION_STORE_FILE")
+    def prodStorePassword = System.getenv("PRODUCTION_STORE_PASSWORD") ?: props.getProperty("PRODUCTION_STORE_PASSWORD")
+    def prodKeyAlias = System.getenv("PRODUCTION_KEY_ALIAS") ?: props.getProperty("PRODUCTION_KEY_ALIAS")
+    def prodKeyPassword = System.getenv("PRODUCTION_KEY_PASSWORD") ?: props.getProperty("PRODUCTION_KEY_PASSWORD")
+
+    signingConfigs {
+        release {
+            storeFile file("${project.rootDir}/${prodStoreFile}")
+            storePassword prodStorePassword
+            keyAlias prodKeyAlias
+            keyPassword prodKeyPassword
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation project(':domain')
+    implementation project(':data')
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.databinding:viewbinding:7.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-core:$koin_version"
+    testImplementation "io.insert-koin:koin-test:$koin_version"
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    //Compose
+    // Integration with activities
+    implementation 'androidx.activity:activity-compose:1.4.0'
+    // Compose Material Design
+    implementation 'androidx.compose.material:material:1.1.1'
+    // Animations
+    implementation 'androidx.compose.animation:animation:1.1.1'
+    // Tooling support (Previews, etc.)
+    implementation 'androidx.compose.ui:ui-tooling:1.1.1'
+    // Integration with ViewModels
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1'
+    // UI Tests
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.1.1'
+    implementation "androidx.compose.runtime:runtime-livedata:1.1.1"
+
+    //google sign in
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+}

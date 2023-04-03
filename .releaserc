@@ -1,0 +1,43 @@
+{
+  "branches": ["main", "beta", "internal"],
+  "debug": true,
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "./gradlew bumperSemanticRelease -PbumperVersionName=${nextRelease.version} --stacktrace"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "./gradlew assemble --stacktrace"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "./gradlew bundleRelease --stacktrace"
+      }
+    ],
+    "@semantic-release/git",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "app/build/outputs/apk/release/*.apk",
+            "name": "App-${nextRelease.version}.apk"
+          },
+          {
+            "path": "app/build/outputs/bundle/release/*.aab",
+            "name": "App-${nextRelease.version}.aab"
+          },
+        ]
+      }
+    ]
+  ]
+}
