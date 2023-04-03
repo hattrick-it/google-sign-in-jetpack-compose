@@ -1,4 +1,4 @@
-# Google Sign-in with Jetpack Compose MVVM clean architecture
+## Google Sign-in with Jetpack Compose MVVM clean architecture
 
 * An effortless implementation of Google Sign-in with Jetpack Compose MVVM architecture
 
